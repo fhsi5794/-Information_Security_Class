@@ -1,6 +1,25 @@
-Information Security
+Information Security HW1
 ===
+## Methods
 
-Homeworks of Information Security class.
+1. Caesar cipher
+2. Playfair cipher
+3. Vernam proposed the autokey system
+4. Row transposition
+5. Rail fence cipher
+---
+## Detail
 
-Methods of encryption and decryption.
+### Caesar cipher
+
+### Playfair cipher
+
+### Vernam proposed the autokey system
+
+### Row transposition
+
+### Rail fence cipher
+
+---
+
+###### tags: `Information Security` `encryption` `decryption`
