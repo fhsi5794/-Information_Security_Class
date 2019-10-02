@@ -86,9 +86,9 @@ string playfair(string cipher, string key)
         }
         else
         {
-            int diff=(cid[0]%5)-(cid[1]%5);
-            out[i-1]=table[cid[0]-diff];
-            out[i]=table[cid[1]+diff];
+            int dis=(cid[0]%5)-(cid[1]%5);
+            out[i-1]=table[cid[0]-dis];
+            out[i]=table[cid[1]+dis];
         }
     }
     
