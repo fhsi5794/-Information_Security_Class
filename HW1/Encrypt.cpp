@@ -50,6 +50,8 @@ string playfair(string plaint, string key)
             table.push_back('A'+i);
     int count=0;
     for(int i=0;i<key.length();i++)
+    {
+        if(key[i]=='J') key[i]='I';
          for(int j=count;j<25;j++)
              if(key[i]==table[j])
              {
@@ -58,6 +60,7 @@ string playfair(string plaint, string key)
                  count++;
                  break;
              }
+    }
     //build cipher
     out=plaint;
     for(int i=0;i<out.length();i++)

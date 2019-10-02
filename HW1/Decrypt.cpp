@@ -51,6 +51,7 @@ string playfair(string cipher, string key)
     for(int i=0;i<key.length();i++)
     {
         key[i]=key[i]-'A'+'a';
+        if(key[i]=='j') key[i]='i';
          for(int j=count;j<25;j++)
              if(key[i]==table[j])
              {
