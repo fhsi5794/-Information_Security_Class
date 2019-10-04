@@ -145,7 +145,8 @@ Output: ```doyourbestandthenletgo```
 ## Vernam proposed the autokey system
 #### 加密
 ```string vernam(string plaint, string key)```  
-1. autokey:將部分plainteat加在key後面，key長度plainteat相同。  
+1. 做autokey:將部分plainteat加在key後面，key長度plainteat相同。  
+<img width="500" height="200" src="https://i.imgur.com/CvKQ463.png">  
 ```c++=127
 key.append(plaint, 0, plaint.length()-key.length());
 ```
@@ -177,6 +178,9 @@ Output: ```doyourbestandthenletgo```
 
 ## Row transposition
 #### 加密
+
+<img width="500" height="300" src="https://i.imgur.com/flC0ZF3.png">  
+
 ```string row_trans(string plaint, string key)```  
 1. 先分好列  
 ```c++=142
@@ -225,6 +229,9 @@ Output: ```doyourbestandthenletgo```
 #### 加密
 ```string rail_fence(string plaint, string key)```  
 依照規則，碰到底網上，碰到頂往下。  
+
+<img width="400" height="150" src="https://i.imgur.com/jJPvSFp.png">  
+
 ```c++=161
 for(int i=0;i<plaint.length();)
 	{
