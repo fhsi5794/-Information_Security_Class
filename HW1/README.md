@@ -9,7 +9,7 @@ Information Security HW1
 5. Rail fence cipher
 
 ## Input
-使用程式：C++  
+使用環境、程式：Linux  C++  
 加密檔案：Encrypt.cpp  
 解密檔案：Decrypt.cpp  
 輸入：  
