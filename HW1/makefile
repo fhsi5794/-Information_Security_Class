@@ -1,5 +1,5 @@
-all: Encryption.cpp Decryption.cpp
-	g++ Encryption.cpp -o  Encryption 
-	g++ Decryption.cpp -o  Decryption 
+all: Encrypt.cpp Decrypt.cpp
+	g++ Encrypt.cpp -o  Encrypt 
+	g++ Decrypt.cpp -o  Decrypt 
 clean:
 	rm -f *.o *.exe
