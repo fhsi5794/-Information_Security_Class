@@ -1,141 +1,146 @@
-Information Security HW1
+Information Security HW2
 ===
 ## Methods
 
-1. Caesar cipher
-2. Playfair cipher
-3. Vernam proposed the autokey system
-4. Row transposition
-5. Rail fence cipher
+Data Encryption Standard (DES)
 
 ## Input
+使用環境、程式：Linux  C++  
+加密檔案：EncryptDES.cpp  
+解密檔案：DecryptDES.cpp  
+輸入：  
 ```
-./Encrypt {Cipher} {Key} {Plaintext}
+./EncryptDES {Key} {Plaintext}
 ```
 ```
-./Decrypt {Cipher} {Key} {Ciphertext}
+./DecryptDES {Key} {Ciphertext}
 ```
-{Cipher} : caesar ,playfair ,vernam ,row ,rail_fence
-
 ---
 # Detail
+DES 是 Feistel network ，故加密、解密只差在 key schedule 的部分。
+## Functions
+### Permutation
+依照對應 table 提供的順序重新排列原本的 bits 。
+<img width="400" height="150" src="https://i.imgur.com/7UA0Efp.png">  
 
-## Caesar cipher
-
-
-#### 加密
-將字母往後位移key位數，因不希望超出26字母範圍，故在最後要 mod 26。
-```c++=17
-string caesar(string plaint, string key)
+```c++=276
+string permu(string str,const int table[],int size)
 {
-	string out=plaint;
-	for(int i=0;i<plaint.length();i++)
-	{
-		out[i]=((plaint[i]-'a')+(key[0]-'0'))%26+'A';
-	}
-	return out;
+    string result(size,'0');
+    for(int i=0;i<size;i++)
+        result[i]=str[table[i]-1];
+    return result;
 }
 ```
-#### 解密
-將字母往前移ken位數，因不希望超出26字母範圍，故意開始要先加26然後再做 mod 26。  
-＊程式碼基本上就是加密的反向，這邊就不貼上來了。 
-#### 結果
-<img width="1000" height="100" src="https://i.imgur.com/XqUE0Hw.png">
 
-## Playfair cipher
-#### 加密
-1. 先製作5X5矩陣，將I/J視為同字，所以這邊我將J都換成I。
-```c++=46
-    vector<char>table;
-    for(int i=0;i<26;i++)
-        if(i!=9)
-            table.push_back('A'+i);
-    int count=0;
-    for(int i=0;i<key.length();i++)
+### F-Function
+DES的主要核心。
+1. 做 expantion 。 **(line 306)**
+2. 將 R 和 key 做 XOR 。 **(line 307)**
+3. 做 S-box substitution 。 **(line 308~318)**
+* 把字串分成八份。 **(line 309~313)**
+* 取每組的頭尾 bit 為 row ，中間為 colum ，對應到Sbox的值換成二進制(4 bit)，串接成結果。 **(line 314~318)**
+<img width="400" height="250" src="https://i.imgur.com/duHV5pS.png">  
+
+4. 做 permute 。  **(line 319)**
+
+```c++=303
+string func(string rstr, string key)
+{
+    string result="";
+    result=permu(rstr, expansion, 48);
+    result=doXOR(result, key);
+    string sstr[8];
+    for(int i=0;i<8;i++)
     {
-        if(key[i]=='J') key[i]='I';
-         for(int j=count;j<25;j++)
-             if(key[i]==table[j])
-             {
-                 table.erase(table.begin()+j);
-                 table.insert(table.begin()+count,key[i]);
-                 count++;
-                 break;
-             }
+        sstr[i].append(result,0,6);
+        result.erase(0,6);
     }
-```
-5X5矩陣示意:  
-<img width="500" height="200" src="https://i.imgur.com/ohurBUx.png">  
-2. 兩兩一組，若欲相同字母或最後剩一個字母，則插入X。
-```c++=70
-    for(int i=1;i<out.length();i+=2)
+    for(int i=0;i<8;i++)
     {
-        char c[2]={out[i-1],out[i]};
-        if(c[0]==c[1])
-        {
-            out.insert(out.begin()+i,'X');
-        }
+        sstr[i]=toBinary(DesSbox[i][2*(sstr[i][0]-'0')+(sstr[i][5]-'0')][8*(sstr[i][1]-'0')+4*(sstr[i][2]-'0')+2*(sstr[i][3]-'0')+(sstr[i][4]-'0')]);
+        result+=sstr[i];
     }
-    if(out.length()%2==1)
-        out.insert(out.end(),'X');
+    result=permu(result, pBox, 32);
+    return result;
+}
 ```
-3. 照規則加密
-* 兩字母在同一橫列：取字母右方的字，若位於最右方，則取最左字。 
-```c=84
-    if((cid[0]/5)==(cid[1]/5))
+
+## 加密
+### Key Schedule 
+1. 做 Permutation。
+2. 將key分成兩半，左半為cstr、右半為dstr。
+3. transform 1 ~ transform 16：
+* 做 transform 1, 2, 9, 16 時，cstr、dstr 各往左移 1 bit；其他 transform 則往右移 2 bit 。
+* 合併做 Permutation 存入 keys[] ，待候用。
+<img width="450" height="250" src="https://i.imgur.com/K5GDXRx.png">
+
+```c++=148
+while(count<=16)
     {
-            for(int j=0;j<2;j++)
-            {
-                if((cid[j]%5)==4)
-                    out[i-1+j]=table[cid[j]-4];
-                else
-                    out[i-1+j]=table[cid[j]+1];
-            }
+        if((count==1)||(count==2)||(count==9)||(count==16))
+        {
+            cstr=rotateBit(cstr, 1);
+            dstr=rotateBit(dstr, 1);
+        }
+        else
+        {
+            cstr=rotateBit(cstr, 2);
+            dstr=rotateBit(dstr, 2);
+        }
+        keys[count-1]=permu((cstr+dstr),pc2,48);
+        count++;
     }
-```
-* 兩字母在同一直列：取字母下方的字，若位於最下方，則取最上字。
-```c=94
-    else if((cid[0]%5)==(cid[1]%5))
+``` 
+
+### Feistel Network
+1. 做 Permutation。
+2. 將key分成兩半，左半為lstr、右半為rstr。
+4. round 1 ~ round 16，產生新的 lstr、rstr：
+* 新 lstr = 舊 rstr。
+* 新 rstr = ( **舊 lstr** ) XOR ( **F-Function( 舊 rstr, keys[i] )** )。
+<img width="450" height="250" src="https://i.imgur.com/qwFcC65.png">  
+
+5. 合併做 Permutation 即為加密結果。
+```c++=148
+while(count<=16)
+    {
+        if((count==1)||(count==2)||(count==9)||(count==16))
         {
-            for(int j=0;j<2;j++)
-            {
-                if((cid[j]/5)==4)
-                    out[i-1+j]=table[cid[j]-20];
-                else
-                    out[i-1+j]=table[cid[j]+5];
-            }
+            cstr=rotateBit(cstr, 1);
+            dstr=rotateBit(dstr, 1);
         }
-```
-* 兩字母不在同一橫/直列：取另外兩個字母，使這四個字母成為一個矩形。
-* 我這邊是去該字母同橫列，位於另一字母上/下方的字。 
-```c=104
-    else
+        else
         {
-            int dis=(cid[0]%5)-(cid[1]%5);
-            out[i-1]=table[cid[0]-dis];
-            out[i]=table[cid[1]+dis];
+            cstr=rotateBit(cstr, 2);
+            dstr=rotateBit(dstr, 2);
         }
+        keys[count-1]=permu((cstr+dstr),pc2,48);
+        count++;
+    }
+``` 
+## 解密
+與加密作法幾乎都一樣，只差在下述一個地方：
+在 f-function 時，將 transformed keys 反向輸入。
+```c++=171
+rstr=doXOR(temp, func(rstr,keys[17-count-1]));
 ```
 
-#### 解密
-1. 製作5X5矩陣。
-2. 依規則解密
-* 兩字母在同一橫列：取字母左方的字，若位於最左方，則取最右字。
-* 兩字母在同一直列：取字母上方的字，若位於最上方，則取最下字。
-* 兩字母不在同一橫/直列：取另外兩個字母，使這四個字母成為一個矩形。   
-＊前兩項的程式就是加密的反向，而最後一項則和加密完全相同。
-## Vernam proposed the autokey system
-#### 加密
-#### 解密
+## 結果
+Plaintext: 0xabcdef0123456789  
 
-## Row transposition
-#### 加密
-#### 解密
+Input: ```./EncryptDES 0xafafafafafafafaf 0xabcdef0123456789 ```  
+Output: ```0x4C30FC30FB2B0BFF```  
 
-## Rail fence cipher
-#### 加密
-#### 解密
+Input: ```./DecryptDES 0xafafafafafafafaf 0x4C30FC30FB2B0BFF```  
+Output: ```0xabcdef0123456789```  
+
+<img width="600" height="75" src="https://i.imgur.com/dHtPdxd.png">  
+
+## 遇到困難與心得
+因為過程基本上都是查表，我覺得不算特別困難，但正因如此，我很佩服做出這個加密法的人，能利用簡單的過程得到不容易被破解的結果。
 
 ---
 
-###### tags: `Information Security` `encryption` `decryption`
+###### tags: `Information Security` `DES` `encryption` `decryption`
+
