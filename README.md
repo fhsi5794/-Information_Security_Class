@@ -1,7 +1,7 @@
-Information Security
+Information Security Homeworks
 ===
 
-Homeworks of Information Security class.
+Homeworks of Information Security class.  
 
 Methods of encryption and decryption.
 
