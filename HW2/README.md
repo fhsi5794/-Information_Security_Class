@@ -20,7 +20,8 @@ Data Encryption Standard (DES)
 DES 是 Feistel network ，故加密、解密只差在 key schedule 的部分。
 ## Functions
 ### Permutation
-依照對應 table 提供的順序重新排列原本的 bits 。
+依照對應 table 提供的順序重新排列原本的 bits 。   
+
 <img width="400" height="150" src="https://i.imgur.com/7UA0Efp.png">  
 
 ```c++=276
