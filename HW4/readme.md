@@ -20,7 +20,7 @@ RSA.py {Mode} {Plaintext} {p} {q}
 <img width="234" height="63" src="https://i.imgur.com/N4ncdb9.png">  
 # Detail
 本程式有兩種mode，差異在於明文的輸入。  
-num：明文為純數字輸入，直接對此數字進行加密。
+num：明文為純數字輸入，直接對此數字進行加密。  
 text：明文為一段字串，加密時會轉成ACII，個別對其加密。  
 ## Variables
 根據給定的質數p和質數q產生需要用到的變數：n, φ(n), e, d  
