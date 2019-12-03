@@ -1,8 +1,7 @@
 Information Security HW4
 ===
 ## Methods
-
-Advanced Encryption Standard (AES)
+RSA (Rivest–Shamir–Adleman)  
 
 ## Input
 使用環境、程式：Linux  Python3  
