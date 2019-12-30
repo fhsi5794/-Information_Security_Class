@@ -1,96 +1,78 @@
-Information Security HW4
+Information Security HW5
 ===
 ## Methods
-RSA (Rivest–Shamir–Adleman)  
+DSA (Digital Signature Algorithm)  
 
 ## Input
 使用環境、程式：Linux  Python3  
-檔案：RSA.py  
-Mode : num, text  
+檔案：DSA.py  
 輸入：  
 ```
-RSA.py {Mode} {Plaintext} {p} {q}
+python3 DSA.py 
 ```
 ---
-# RSA
-給一個公共鑰匙(public key):key(n,e)  
-和一個私人鑰匙(private key):d  
+# DSA
+## 0. Message Hashing
+雜湊訊息（hashing message) : h  
+此用SHA-1  
 
-產生密文y、明文x： 
-<img width="234" height="63" src="https://i.imgur.com/N4ncdb9.png">  
-# Detail
-本程式有兩種mode，差異在於明文的輸入。  
-num：明文為純數字輸入，直接對此數字進行加密。  
-text：明文為一段字串，加密時會轉成ACII，個別對其加密。  
-## Variables
-根據給定的質數p和質數q產生需要用到的變數：n, φ(n), e, d  
-1. n = p*q  
-```python=8
-n=p*q
-```
-3. φ(n) = (p-1)(q-1)  
-```python=10
-phi=(p-1)*(q-1)
-```
-4. e => { 0<e<φ(n) AND gcd(e,φ(n))=1 }
-```python=12
-e=0
-for i in range(2,phi):
-    if gcd(i,phi)==1 :
-        e=i
-        break
-```
-5. d => d*e≡1(mod φ(n))
-```python=18
-d = 0
-for i in range(2,phi):
-    if (e*i%phi)==1 :
-        d=i
-        break
-```
+<img width="550" height="350" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/SHA-1.svg/600px-SHA-1.svg.png">  
 
-## Encryption & Decryption
-<img width="234" height="63" src="https://i.imgur.com/N4ncdb9.png">  
+[SHA-1 - 维基百科](https://zh.wikipedia.org/wiki/SHA-1)  
 
-### Number Mode
-Encryption：Plaintext＾e mod n  
-Decryption：ciphertext＾d mod n  
-```python=25
-if mode=="num" :
-    plain=int(plain)
-    cipher=pow(plain, e, n )
-    decrypted=pow(cipher, d, n)
+## 1. Key Generation
+私人鑰匙(private key) : d  
 ```
+d : { 0 < d < q }
+```  
+公共鑰匙(public key) : key(p, q, α, β)  
+```
+p : 2的1023~1024次方中的質數
+q : 2的159~160次方中的質數
+==> p, q 滿足 { p = kq + 1 }
 
-### Text Mode
-Encryption：Plaintext[i]＾e mod n  
-對Plaintext每個字（轉成ACII）進行加密動作，然後存到list裡面供解密時使用。  
-```python=32
-    for i in range(len(plain)):
-        cipherList.append(pow(ord(plain[i]),e,n))
-        cipher+=str(cipherList[i])
+α : 
+    1. 選一h：{ 1 < h < (p−1) }
+    2. α = h ^ ( ( p − 1 ) / q ) mod p
+    3. α ^ q ≡ 1 ( mod p )
+    
+β : β = α ^ d mod p 
 ```
-Decryption：cipherList[i]＾d mod n  
-將list中的元素進行解密，然後轉成字元(chr)。
-```python=36
-    for i in range(len(plain)):
-        decrypted+=chr(pow(cipherList[i],d,n))
+## 2. Signature Generation
+簽名(signature) ：sig(r, s)  
 ```
+1. 生成 k : { 0 < k < q}
+2. r = α ^ k mod p mod q
+3. s = ( h + d * r) * k^(-1) mod q 
+```  
+註：  
+k^(-1) 為k的模反元素（modular multiplicative inverse），可用擴展歐幾里得算法（Extended Euclidean algorithm）求得。  
 
+[我的求模反元素的code](https://github.com/fhsi5794/Information_Security_Class/blob/master/HW5/ModIeverse.py)
+## 3. Signature Verification
+Given: hashing message h, signature (r, s) and public key (p, q, α, β)  
+Verify:
+```
+1. w = s ^ (-1) mod q
+2. u1 = w * h mod q
+3. u2 = w *r mod q
+4. v = (α ^ u1 * β ^ u2) mod p mod q
+
+if { v ≡ r mod q } ==> signature is valid
+if { v ≠ r mod q } ==> signature is invalid
+```
 ## Result
-```python3 RSA.py num 4 11 3```  
-```python3 RSA.py num 3320 2999 2663```  
-```python3 RSA.py text hello  2999 3571```  
+```python3 DSA.py ```  
 
-<img width="650" height="700" src="https://i.imgur.com/EwJQoAC.png">  
+<img width="850" height="300" src="https://i.imgur.com/1jwuFgy.png">  
 
 
 
 ## 遇到困難與心得
-Python做大數運算真的很方便。  
+Python很好用。  
 
 ---
 
-###### tags: `Information Security` `RSA` `encryption` `decryption`
+###### tags: `Information Security` `DSA` `encryption` `decryption`
 
 
