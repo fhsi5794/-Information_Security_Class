@@ -20,3 +20,6 @@ Advanced Encryption Standard (AES)
 
 ## HW4
 RSA (Rivest–Shamir–Adleman)
+
+## HW5
+DSA (Digital Signature Algorithm)
