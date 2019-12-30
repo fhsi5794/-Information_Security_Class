@@ -9,7 +9,7 @@ RSA (Rivest–Shamir–Adleman)
 Mode : num, text  
 輸入：  
 ```
-RSA.py {Mode} {Plaintext} {p} {q}
+python3 RSA.py {Mode} {Plaintext} {p} {q}
 ```
 ---
 # RSA
